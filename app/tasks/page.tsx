@@ -10,95 +10,48 @@ import {
     ArrowRight,
     ChevronDown,
     Lock,
-    MessageSquare
+    MessageSquare,
+    Loader2
 } from 'lucide-react';
+import { useTasks } from '@/hooks/use-tasks';
+import Link from 'next/link';
 
 const roles = ['All Roles', 'Backend Engineer', 'Frontend Engineer', 'Systems Engineer', 'Data Engineer'];
 const difficulties = ['All Levels', 'Beginner', 'Intermediate', 'Advanced'];
 
-const taskList = [
-    {
-        id: 1,
-        title: 'Design a URL Shortener',
-        role: 'Backend Engineer',
-        difficulty: 'Intermediate',
-        time: '30m',
-        responses: 1240,
-        score: 8.5,
-        locked: false
-    },
-    {
-        id: 2,
-        title: 'Collaborative Document Editor',
-        role: 'Systems Engineer',
-        difficulty: 'Advanced',
-        time: '45m',
-        responses: 856,
-        score: null,
-        locked: false
-    },
-    {
-        id: 3,
-        title: 'High-Performance Image Gallery',
-        role: 'Frontend Engineer',
-        difficulty: 'Beginner',
-        time: '20m',
-        responses: 2100,
-        score: 9.1,
-        locked: false
-    },
-    {
-        id: 4,
-        title: 'Real-time Analytics Dashboard',
-        role: 'Data Engineer',
-        difficulty: 'Intermediate',
-        time: '40m',
-        responses: 540,
-        score: null,
-        locked: true
-    },
-    {
-        id: 5,
-        title: 'Distributed Key-Value Store',
-        role: 'Backend Engineer',
-        difficulty: 'Advanced',
-        time: '60m',
-        responses: 320,
-        score: 7.2,
-        locked: false
-    },
-    {
-        id: 6,
-        title: 'Micro-Frontend Architecture',
-        role: 'Frontend Engineer',
-        difficulty: 'Intermediate',
-        time: '35m',
-        responses: 780,
-        score: null,
-        locked: false
-    },
-];
-
 export default function TasksPage() {
     const [selectedRole, setSelectedRole] = useState('All Roles');
     const [selectedDiff, setSelectedDiff] = useState('All Levels');
+    const [searchQuery, setSearchQuery] = useState('');
+
+    const roleParam = selectedRole === 'All Roles' ? undefined : selectedRole;
+    const diffParam = selectedDiff === 'All Levels' ? undefined : selectedDiff.toLowerCase();
+
+    const { tasks, loading, error } = useTasks(roleParam, diffParam);
+
+    const filteredTasks = tasks.filter(t =>
+        t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        t.description.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     return (
-        <div className="max-w-6xl mx-auto space-y-8">
+        <div className="space-y-8 py-4">
             {/* Header & Filters */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
-                    <h1 className="text-3xl font-display font-bold mb-2">Engineering Tasks</h1>
-                    <p className="text-slate-400">Apply your architectural thinking to real-world scenarios.</p>
+                    <h1 className="text-2xl font-black mb-1 uppercase tracking-tighter">Engineering Tasks</h1>
+                    <p className="text-[13px] text-neutral-500 font-medium">Apply your architectural thinking to real-world scenarios.</p>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-4">
+                <div className="flex flex-wrap items-center gap-3">
                     <div className="relative">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-neutral-600" />
                         <input
                             type="text"
                             placeholder="Search tasks..."
-                            className="bg-white/5 border border-white/10 rounded-xl pl-12 pr-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 w-64"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="bg-neutral-900 border border-white/5 rounded-lg pl-10 pr-4 py-2 text-[12px] focus:outline-none focus:border-white/10 w-48 transition-all"
                         />
                     </div>
 
@@ -107,75 +60,63 @@ export default function TasksPage() {
                 </div>
             </div>
 
-            {/* Task Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {taskList.map((task, i) => (
-                    <motion.div
-                        key={task.id}
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: i * 0.05 }}
-                        className={`
-              glass-card flex flex-col p-6 border-white/5 hover:border-indigo-500/30 transition-all group relative
-              ${task.locked ? 'opacity-75 grayscale' : ''}
-            `}
-                    >
-                        {task.locked && (
-                            <div className="absolute top-4 right-4 text-slate-500">
-                                <Lock className="w-5 h-5" />
-                            </div>
-                        )}
-
-                        <div className="flex items-center gap-3 mb-4">
-                            <span className={`
-                px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest
-                ${task.difficulty === 'Beginner' ? 'bg-emerald-500/10 text-emerald-400' : ''}
-                ${task.difficulty === 'Intermediate' ? 'bg-indigo-500/10 text-indigo-400' : ''}
-                ${task.difficulty === 'Advanced' ? 'bg-rose-500/10 text-rose-400' : ''}
-              `}>
-                                {task.difficulty}
-                            </span>
-                            <span className="text-xs text-slate-500 font-medium">{task.role}</span>
-                        </div>
-
-                        <h3 className="text-xl font-bold text-slate-200 mb-4 group-hover:text-white transition-colors">
-                            {task.title}
-                        </h3>
-
-                        <div className="flex-1" />
-
-                        <div className="mt-8 pt-6 border-t border-white/5 flex items-center justify-between">
-                            <div className="flex items-center gap-6">
-                                <div className="flex items-center gap-2 text-slate-500">
-                                    <Clock className="w-4 h-4" />
-                                    <span className="text-xs font-semibold">{task.time}</span>
-                                </div>
-                                <div className="flex items-center gap-2 text-slate-500">
-                                    <MessageSquare className="w-4 h-4" />
-                                    <span className="text-xs font-semibold">{task.responses}</span>
-                                </div>
+            {loading ? (
+                <div className="h-64 flex items-center justify-center">
+                    <Loader2 className="w-6 h-6 animate-spin text-neutral-700" />
+                </div>
+            ) : error ? (
+                <div className="p-12 text-center rounded-2xl border border-white/5 bg-neutral-900/10 text-neutral-500 text-sm">
+                    {error}
+                </div>
+            ) : filteredTasks.length === 0 ? (
+                <div className="p-20 text-center rounded-2xl border border-dashed border-white/5 text-neutral-600 text-[13px] font-medium uppercase tracking-widest">
+                    No tasks found matching your filters.
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {filteredTasks.map((task, i) => (
+                        <motion.div
+                            key={task.id}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: i * 0.05 }}
+                            className="p-5 rounded-2xl border border-white/5 bg-neutral-900/10 hover:bg-neutral-900/30 transition-all group relative"
+                        >
+                            <div className="flex items-center gap-3 mb-4">
+                                <span className="px-2 py-0.5 rounded bg-white/5 border border-white/10 text-[9px] font-bold uppercase tracking-widest text-neutral-400">
+                                    {task.difficulty}
+                                </span>
+                                <span className="text-[10px] text-neutral-500 font-bold uppercase tracking-widest">{task.role}</span>
                             </div>
 
-                            {task.score ? (
-                                <div className="flex items-center gap-2">
-                                    <span className="text-xs font-bold text-slate-500 uppercase">Score</span>
-                                    <div className="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center font-bold text-indigo-400 text-sm">
-                                        {task.score}
+                            <h3 className="text-lg font-bold text-neutral-200 mb-6 group-hover:text-white transition-colors">
+                                {task.title}
+                            </h3>
+
+                            <div className="mt-auto pt-5 border-t border-white/5 flex items-center justify-between">
+                                <div className="flex items-center gap-4">
+                                    <div className="flex items-center gap-1.5 text-neutral-600 group-hover:text-neutral-400 transition-colors">
+                                        <Clock className="w-3.5 h-3.5" />
+                                        <span className="text-[11px] font-bold">{task.estimated_time_minutes}m</span>
+                                    </div>
+                                    <div className="flex items-center gap-1.5 text-neutral-600 group-hover:text-neutral-400 transition-colors">
+                                        <MessageSquare className="w-3.5 h-3.5" />
+                                        <span className="text-[11px] font-bold">1.2k</span>
                                     </div>
                                 </div>
-                            ) : (
-                                <button
-                                    disabled={task.locked}
-                                    className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 group-hover:bg-indigo-600 group-hover:border-indigo-600 group-hover:text-white text-slate-300 text-xs font-bold transition-all flex items-center gap-2"
+
+                                <Link
+                                    href={`/tasks/${task.id}`}
+                                    className="px-4 py-1.5 rounded-lg bg-white/5 border border-white/10 hover:bg-white text-neutral-400 hover:text-black text-[11px] font-bold transition-all flex items-center gap-2"
                                 >
                                     START
-                                    <ArrowRight className="w-4 h-4" />
-                                </button>
-                            )}
-                        </div>
-                    </motion.div>
-                ))}
-            </div>
+                                    <ArrowRight className="w-3.5 h-3.5" />
+                                </Link>
+                            </div>
+                        </motion.div>
+                    ))}
+                </div>
+            )}
         </div>
     );
 }
@@ -187,16 +128,16 @@ function FilterDropdown({ label, items, onSelect }: { label: string, items: stri
         <div className="relative">
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm font-medium flex items-center gap-3 hover:bg-white/10 transition-colors"
+                className="bg-neutral-900 border border-white/5 rounded-lg px-3.5 py-2 text-[11px] font-bold uppercase tracking-widest flex items-center gap-2 hover:bg-neutral-800 transition-colors"
             >
                 {label}
-                <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-3 h-3 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
             </button>
 
             {isOpen && (
                 <>
                     <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
-                    <div className="absolute top-full mt-2 w-full min-w-[180px] bg-slate-900 border border-white/10 rounded-xl shadow-2xl py-2 z-20 overflow-hidden">
+                    <div className="absolute top-full mt-1.5 right-0 min-w-[160px] bg-neutral-900 border border-white/10 rounded-xl shadow-2xl py-2 z-20 overflow-hidden">
                         {items.map(item => (
                             <button
                                 key={item}
@@ -204,7 +145,7 @@ function FilterDropdown({ label, items, onSelect }: { label: string, items: stri
                                     onSelect(item);
                                     setIsOpen(false);
                                 }}
-                                className={`w-full text-left px-4 py-2 text-sm hover:bg-white/5 transition-colors ${label === item ? 'text-indigo-400 font-bold bg-indigo-500/5' : 'text-slate-400'}`}
+                                className={`w-full text-left px-4 py-2 text-[11px] font-bold tracking-widest uppercase hover:bg-white/5 transition-colors ${label === item ? 'text-white bg-white/5' : 'text-neutral-500'}`}
                             >
                                 {item}
                             </button>

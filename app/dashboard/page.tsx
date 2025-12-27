@@ -8,46 +8,52 @@ import {
     BrainCircuit,
     Trophy,
     ArrowUpRight,
-    Clock,
     CheckCircle2,
     TrendingUp,
-    Target
+    Target,
+    Loader2
 } from 'lucide-react';
-
-const stats = [
-    { label: 'Tasks Completed', value: '15', icon: CheckCircle2, color: 'text-indigo-400', bg: 'bg-indigo-400/10' },
-    { label: 'Think Score', value: '8.2', icon: Target, color: 'text-cyan-400', bg: 'bg-cyan-400/10' },
-    { label: 'Drill Accuracy', value: '92%', icon: BrainCircuit, color: 'text-violet-400', bg: 'bg-violet-400/10' },
-    { label: 'Global Rank', value: '#128', icon: Trophy, color: 'text-orange-400', bg: 'bg-orange-400/10' },
-];
-
-const recentTasks = [
-    { id: 1, title: 'Design a URL Shortener', role: 'Backend', score: 8.5, date: '2 hours ago' },
-    { id: 2, title: 'Real-time Chat Sync', role: 'Systems', score: 7.8, date: '1 day ago' },
-    { id: 3, title: 'Distributed Locking Service', role: 'Backend', score: 9.2, date: '3 days ago' },
-];
+import { useProgress } from '@/hooks/use-progress';
+import { useDailyChallenge } from '@/hooks/use-tasks';
+import Link from 'next/link';
 
 export default function Dashboard() {
+    const { stats, history, loading: progressLoading } = useProgress();
+    const { task: dailyTask, loading: taskLoading } = useDailyChallenge();
+
+    if (progressLoading || taskLoading) {
+        return (
+            <div className="h-96 flex items-center justify-center">
+                <Loader2 className="w-6 h-6 animate-spin text-neutral-500" />
+            </div>
+        );
+    }
+
+    const statCards = [
+        { label: 'Tasks Completed', value: stats?.total_tasks_completed || 0, icon: CheckCircle2 },
+        { label: 'Think Score', value: stats?.average_score?.toFixed(1) || '0.0', icon: Target },
+        { label: 'Total Score', value: stats?.total_score?.toFixed(0) || 0, icon: BrainCircuit },
+        { label: 'Current Streak', value: `${stats?.current_streak || 0}d`, icon: Trophy },
+    ];
+
     return (
-        <div className="space-y-10">
+        <div className="space-y-10 py-4">
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {stats.map((stat, i) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {statCards.map((stat, i) => (
                     <motion.div
                         key={stat.label}
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.1 }}
-                        className="glass-card p-6 border-white/5"
+                        className="p-5 rounded-2xl border border-white/5 bg-neutral-900/20"
                     >
                         <div className="flex items-center justify-between mb-4">
-                            <div className={`p-3 rounded-xl ${stat.bg}`}>
-                                <stat.icon className={`w-6 h-6 ${stat.color}`} />
-                            </div>
-                            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Stats</span>
+                            <stat.icon className="w-4 h-4 text-neutral-500" />
+                            <span className="text-[10px] font-bold text-neutral-600 uppercase tracking-widest">Stats</span>
                         </div>
-                        <p className="text-3xl font-display font-bold text-white mb-1">{stat.value}</p>
-                        <p className="text-sm text-slate-400">{stat.label}</p>
+                        <p className="text-2xl font-black text-white">{stat.value}</p>
+                        <p className="text-[12px] text-neutral-500 font-medium">{stat.label}</p>
                     </motion.div>
                 ))}
             </div>
@@ -57,98 +63,99 @@ export default function Dashboard() {
                 <div className="lg:col-span-2 space-y-8">
                     {/* Daily Challenge */}
                     <section>
-                        <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-2xl font-display font-bold flex items-center gap-3">
-                                <Zap className="w-6 h-6 text-orange-400 fill-orange-400" />
-                                Daily Challenge
-                            </h2>
+                        <div className="flex items-center gap-2 mb-4">
+                            <Zap className="w-4 h-4 text-white fill-white" />
+                            <h2 className="text-sm font-bold uppercase tracking-widest">Daily Challenge</h2>
                         </div>
-                        <div className="relative group overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-600 to-violet-700 p-8 shadow-2xl shadow-indigo-500/20">
-                            <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform duration-500">
-                                <Terminal className="w-40 h-40" />
+
+                        {dailyTask ? (
+                            <div className="group relative overflow-hidden rounded-2xl bg-neutral-900 border border-white/10 p-6 transition-all hover:border-white/20">
+                                <div className="absolute top-0 right-0 p-6 opacity-[0.03] group-hover:scale-105 transition-transform duration-700">
+                                    <Terminal className="w-32 h-32" />
+                                </div>
+                                <div className="relative z-10">
+                                    <div className="flex items-center gap-3 mb-4">
+                                        <span className="px-2 py-0.5 rounded bg-white/5 border border-white/10 text-[9px] font-bold uppercase tracking-widest text-neutral-400">
+                                            {dailyTask.difficulty}
+                                        </span>
+                                        <span className="text-[10px] text-neutral-500 font-bold uppercase tracking-widest">
+                                            {dailyTask.estimated_time_minutes} Mins
+                                        </span>
+                                    </div>
+                                    <h3 className="text-2xl font-bold text-white mb-2 leading-tight">
+                                        {dailyTask.title}
+                                    </h3>
+                                    <p className="text-sm text-neutral-400 mb-6 leading-relaxed line-clamp-2">
+                                        {dailyTask.description}
+                                    </p>
+                                    <Link href={`/tasks/${dailyTask.id}`} className="inline-flex items-center gap-2 bg-white text-black px-5 py-2 rounded-lg text-xs font-bold hover:bg-neutral-200 transition-colors">
+                                        Launch Task
+                                        <ArrowUpRight className="w-4 h-4" />
+                                    </Link>
+                                </div>
                             </div>
-                            <div className="relative z-10 max-w-lg">
-                                <span className="inline-block px-3 py-1 rounded-full bg-white/20 text-white text-[10px] font-bold uppercase tracking-widest mb-4">
-                                    Intermediate • 30 Mins
-                                </span>
-                                <h3 className="text-3xl font-display font-bold text-white mb-4">
-                                    Architecting a Global Content Delivery Network (CDN)
-                                </h3>
-                                <p className="text-indigo-100 mb-8 leading-relaxed">
-                                    Design a system to cache and serve heavy assets globally with minimal latency and high cache hit ratios.
-                                </p>
-                                <button className="px-8 py-3 rounded-xl bg-white text-indigo-600 font-bold hover:bg-slate-100 transition-colors flex items-center gap-2">
-                                    Launch Task
-                                    <ArrowUpRight className="w-5 h-5" />
-                                </button>
+                        ) : (
+                            <div className="p-12 rounded-2xl border border-dashed border-white/10 flex flex-col items-center text-neutral-500">
+                                <p className="text-sm font-medium">No challenges available today.</p>
                             </div>
-                        </div>
+                        )}
                     </section>
 
                     {/* Recent History */}
                     <section>
-                        <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-2xl font-display font-bold">Recent History</h2>
-                            <button className="text-sm font-semibold text-indigo-400 hover:text-indigo-300">View All</button>
+                        <div className="flex items-center justify-between mb-4">
+                            <h2 className="text-sm font-bold uppercase tracking-widest">Recent History</h2>
+                            <Link href="/history" className="text-[11px] font-bold text-neutral-500 hover:text-white uppercase tracking-widest transition-colors">View All</Link>
                         </div>
-                        <div className="space-y-4">
-                            {recentTasks.map((task, i) => (
-                                <div key={task.id} className="glass-card p-4 flex items-center justify-between border-white/5 hover:bg-white/5 transition-colors">
+                        <div className="space-y-2">
+                            {history.length > 0 ? history.slice(0, 3).map((resp) => (
+                                <div key={resp.id} className="p-4 rounded-xl border border-white/5 bg-neutral-900/10 flex items-center justify-between hover:bg-white/5 transition-colors">
                                     <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 rounded-xl bg-slate-800 border border-white/5 flex items-center justify-center font-display font-bold text-indigo-400">
-                                            {task.score}
+                                        <div className="w-10 h-10 rounded-lg bg-neutral-900 border border-white/5 flex items-center justify-center font-bold text-xs text-white">
+                                            {resp.score?.toFixed(1)}
                                         </div>
                                         <div>
-                                            <h4 className="font-semibold text-slate-200">{task.title}</h4>
-                                            <p className="text-xs text-slate-500 flex items-center gap-2 mt-1">
-                                                <span>{task.role}</span>
-                                                <span className="w-1 h-1 rounded-full bg-slate-700" />
-                                                <span>{task.date}</span>
+                                            <h4 className="text-sm font-semibold text-neutral-200">Finished Drills</h4>
+                                            <p className="text-[11px] text-neutral-500 uppercase tracking-widest font-bold mt-1">
+                                                {new Date(resp.submitted_at).toLocaleDateString()}
                                             </p>
                                         </div>
                                     </div>
-                                    <button className="p-2 rounded-lg hover:bg-white/5 text-slate-400 hover:text-white">
-                                        <ArrowUpRight className="w-5 h-5" />
+                                    <button className="p-2 text-neutral-600 hover:text-white transition-colors">
+                                        <ArrowUpRight className="w-4 h-4" />
                                     </button>
                                 </div>
-                            ))}
+                            )) : (
+                                <div className="p-8 text-center border border-white/5 rounded-xl text-neutral-600 text-xs font-medium">
+                                    No activity recorded yet.
+                                </div>
+                            )}
                         </div>
                     </section>
                 </div>
 
                 {/* Sidebar Stats */}
-                <div className="space-y-8">
-                    <section className="glass-card p-6 border-white/5 bg-indigo-500/5">
-                        <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
-                            <TrendingUp className="w-5 h-5 text-indigo-400" />
+                <div className="space-y-6">
+                    <section className="p-5 rounded-2xl border border-white/5 bg-neutral-900/10">
+                        <h3 className="text-[12px] font-bold uppercase tracking-widest mb-6 flex items-center gap-2">
+                            <TrendingUp className="w-4 h-4 text-white" />
                             Skill Breakdown
                         </h3>
-                        <div className="space-y-6">
-                            <SkillProgress label="Assumptions" value={85} color="bg-indigo-500" />
-                            <SkillProgress label="Architecture" value={72} color="bg-cyan-500" />
-                            <SkillProgress label="Trade-offs" value={95} color="bg-violet-500" />
-                            <SkillProgress label="Failure Analysis" value={64} color="bg-pink-500" />
+                        <div className="space-y-5">
+                            <SkillProgress label="Clarity" value={78} />
+                            <SkillProgress label="Constraints" value={64} />
+                            <SkillProgress label="Trade-offs" value={92} />
+                            <SkillProgress label="Failure" value={55} />
                         </div>
-                        <div className="mt-8 pt-6 border-t border-white/5">
-                            <div className="flex items-center justify-between text-sm mb-2">
-                                <span className="text-slate-400">Overall Progress</span>
-                                <span className="text-indigo-400 font-bold">Level 14</span>
+                        <div className="mt-8 pt-5 border-t border-white/5">
+                            <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-widest mb-3">
+                                <span className="text-neutral-500">Overall Rank</span>
+                                <span className="text-white">Senior Architect</span>
                             </div>
-                            <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
-                                <div className="h-full bg-indigo-500 w-[78%]" />
+                            <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                                <div className="h-full bg-white w-[68%]" />
                             </div>
                         </div>
-                    </section>
-
-                    <section className="glass-card p-6 border-white/5">
-                        <h3 className="text-lg font-bold mb-4">Thinking Drills</h3>
-                        <p className="text-sm text-slate-400 mb-6 leading-relaxed">
-                            Warm up your brain with a quick exercise in scaling under pressure.
-                        </p>
-                        <button className="w-full py-3 rounded-xl border border-white/10 font-bold hover:bg-white/5 transition-colors flex items-center justify-center gap-2">
-                            Start Drill
-                            <BrainCircuit className="w-5 h-5" />
-                        </button>
                     </section>
                 </div>
             </div>
@@ -156,19 +163,19 @@ export default function Dashboard() {
     );
 }
 
-function SkillProgress({ label, value, color }: { label: string, value: number, color: string }) {
+function SkillProgress({ label, value }: { label: string, value: number }) {
     return (
         <div className="space-y-2">
-            <div className="flex justify-between text-xs font-bold uppercase tracking-widest">
-                <span className="text-slate-500">{label}</span>
-                <span className="text-slate-300">{value}%</span>
+            <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest">
+                <span className="text-neutral-500">{label}</span>
+                <span className="text-neutral-300">{value}%</span>
             </div>
-            <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+            <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
                 <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${value}%` }}
                     transition={{ duration: 1, ease: "easeOut" }}
-                    className={`h-full ${color}`}
+                    className="h-full bg-neutral-400"
                 />
             </div>
         </div>

@@ -1,6 +1,14 @@
 import type { Metadata } from "next";
+import { Inter, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 import AppLayout from "@/components/layout/AppLayout";
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const instrumentSerif = Instrument_Serif({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-serif"
+});
 
 export const metadata: Metadata = {
   title: "Cortex | Master Engineering Thinking",
@@ -15,7 +23,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="scroll-smooth">
-      <body className="antialiased">
+      <body className={`${inter.variable} ${instrumentSerif.variable} antialiased`}>
         <AppLayout>
           {children}
         </AppLayout>
