@@ -37,6 +37,8 @@ export interface TaskResponse {
     task_id: string;
     assumptions: string;
     architecture: string;
+    architecture_data?: string;
+    architecture_image?: string;
     trade_offs: string;
     failure_scenarios: string;
     submitted_at: string;

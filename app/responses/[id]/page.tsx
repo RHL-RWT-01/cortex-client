@@ -235,7 +235,15 @@ export default function ResponseDetail() {
                                         <section.icon className="w-4 h-4 text-neutral-600" />
                                         <h3 className="text-xs font-bold text-neutral-400 uppercase tracking-widest">{section.label}</h3>
                                     </div>
-                                    {section.label === 'Architecture' && section.value.includes('graph') ? (
+                                    {section.label === 'Architecture' && response.architecture_image ? (
+                                        <div className="flex justify-center bg-neutral-950/20 rounded-xl border border-white/5 p-4 overflow-hidden">
+                                            <img
+                                                src={response.architecture_image}
+                                                alt="System Architecture"
+                                                className="max-h-[500px] w-auto h-auto object-contain rounded-lg"
+                                            />
+                                        </div>
+                                    ) : section.label === 'Architecture' && section.value.includes('graph') ? (
                                         <MermaidRenderer code={section.value} />
                                     ) : (
                                         <p className="text-sm text-neutral-500 leading-relaxed whitespace-pre-wrap">{section.value || "No input provided for this section."}</p>

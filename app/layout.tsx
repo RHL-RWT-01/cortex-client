@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Instrument_Serif } from "next/font/google";
 import "./globals.css";
+import "@excalidraw/excalidraw/index.css";
 import AppLayout from "@/components/layout/AppLayout";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });

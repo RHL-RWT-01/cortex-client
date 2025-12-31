@@ -18,7 +18,7 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import api from '@/lib/api';
 import { Task } from '@/lib/types';
-import DiagramEditor from '@/components/DiagramEditor';
+import ArchitectureEditor from '@/components/ArchitectureEditor';
 
 const steps = [
     { id: 'assumptions', label: 'Assumptions', icon: Lightbulb },
@@ -39,6 +39,8 @@ export default function TaskWorkspace() {
     const [answers, setAnswers] = useState({
         assumptions: '',
         architecture: '',
+        architecture_data: '',
+        architecture_image: '',
         'trade-offs': '',
         'failure-modes': '',
     });
@@ -67,7 +69,9 @@ export default function TaskWorkspace() {
             const response = await api.post('/responses', {
                 task_id: taskId,
                 assumptions: answers.assumptions,
-                architecture: answers.architecture,
+                architecture: answers.architecture || 'Visual Architecture Submitted',
+                architecture_data: answers.architecture_data,
+                architecture_image: answers.architecture_image,
                 trade_offs: answers['trade-offs'],
                 failure_scenarios: answers['failure-modes']
             });
@@ -99,7 +103,7 @@ export default function TaskWorkspace() {
     }
 
     return (
-        <div className="h-[calc(100vh-140px)] flex flex-col">
+        <div className="h-[calc(100vh-120px)] flex flex-col">
             <div className="flex items-center justify-between mb-4">
                 <Link href="/dashboard" className="flex items-center gap-2 text-neutral-500 hover:text-white transition-colors group">
                     <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
@@ -119,26 +123,34 @@ export default function TaskWorkspace() {
 
             <div className="flex-1 flex gap-6 min-h-0">
                 {/* Left Side: Scenario */}
-                <div className="flex flex-col gap-4 w-[380px] min-h-0">
-                    <div className="rounded-2xl border border-white/5 bg-neutral-900/10 flex-1 p-6 overflow-y-auto custom-scrollbar">
+                <div className="flex flex-col gap-4 w-[420px] shrink-0 min-h-0">
+                    <div className="rounded-2xl border border-white/5 bg-neutral-900/10 flex-1 p-8 overflow-y-auto custom-scrollbar">
                         <div className="mb-6 pb-6 border-b border-white/5">
                             <span className="text-[9px] font-bold text-neutral-500 uppercase tracking-[0.2em] mb-3 block">System Scenario</span>
-                            <h1 className="text-2xl font-black text-white leading-tight mb-4">{task.title}</h1>
-                            <div className="flex items-center gap-4 text-[10px] font-bold text-neutral-500 uppercase tracking-widest">
-                                <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> {task.estimated_time_minutes}m</span>
-                                <span className="w-1 h-1 rounded-full bg-neutral-800" />
-                                <span>{task.role}</span>
+                            <h1 className="text-3xl font-black text-white leading-[1.1] mb-6 tracking-tighter">{task.title}</h1>
+                            <div className="flex items-center gap-4 text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
+                                <span className="flex items-center gap-1.5 px-2 py-1 rounded bg-white/5 border border-white/5"><Clock className="w-3.5 h-3.5" /> {task.estimated_time_minutes}m</span>
+                                <span className="w-1.5 h-1.5 rounded-full bg-neutral-800" />
+                                <span className="px-2 py-1 rounded bg-white/5 border border-white/5 tracking-[0.1em]">{task.role}</span>
                             </div>
                         </div>
 
-                        <div className="prose prose-invert prose-sm text-neutral-400 leading-relaxed space-y-4">
-                            <p>{task.scenario}</p>
-                            <h3 className="text-white font-bold text-[13px] uppercase tracking-wider pt-2">Requirements</h3>
-                            <ul className="list-disc pl-4 space-y-1 text-[13px]">
-                                {task.description.split('\n').map((line, i) => (
-                                    <li key={i}>{line}</li>
-                                ))}
-                            </ul>
+                        <div className="prose prose-invert prose-sm text-neutral-300 leading-relaxed font-medium space-y-6">
+                            <p className="text-[14px] leading-[1.6] opacity-90">{task.scenario}</p>
+                            <div className="pt-4">
+                                <h3 className="text-white font-bold text-[11px] uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-white" />
+                                    Requirements
+                                </h3>
+                                <ul className="space-y-3">
+                                    {task.description.split('\n').map((line, i) => (
+                                        <li key={i} className="flex gap-3 text-[13px] opacity-70">
+                                            <span className="text-neutral-500 mt-1.5">•</span>
+                                            {line}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -175,7 +187,7 @@ export default function TaskWorkspace() {
 
 
                         {/* Editor */}
-                        <div className="flex-1 p-6 min-h-0">
+                        <div className={`flex-1 min-h-0 ${activeTab === 'architecture' ? '' : 'p-6'}`}>
                             <AnimatePresence mode="wait">
                                 <motion.div
                                     key={activeTab}
@@ -186,10 +198,16 @@ export default function TaskWorkspace() {
                                     className="h-full flex flex-col"
                                 >
                                     {activeTab === 'architecture' ? (
-                                        <DiagramEditor
-                                            value={answers.architecture}
-                                            onChange={(val) => setAnswers({ ...answers, architecture: val })}
-                                        />
+                                        <div className="flex-1 h-full min-h-0 relative">
+                                            <ArchitectureEditor
+                                                data={answers.architecture_data}
+                                                onChange={(data, image) => setAnswers({
+                                                    ...answers,
+                                                    architecture_data: data,
+                                                    architecture_image: image
+                                                })}
+                                            />
+                                        </div>
                                     ) : (
                                         <>
                                             <label className="text-[9px] font-bold text-neutral-600 uppercase tracking-[0.2em] mb-4 block">
