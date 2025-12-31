@@ -105,26 +105,30 @@ export default function Dashboard() {
                     <section>
                         <div className="flex items-center justify-between mb-4">
                             <h2 className="text-sm font-bold uppercase tracking-widest">Recent History</h2>
-                            <Link href="/history" className="text-[11px] font-bold text-neutral-500 hover:text-white uppercase tracking-widest transition-colors">View All</Link>
+                            <Link href="/history" className="text-[11px] font-bold text-neutral-500 hover:text-white uppercase tracking-widest transition-colors">View All Analysis</Link>
                         </div>
                         <div className="space-y-2">
                             {history.length > 0 ? history.slice(0, 3).map((resp) => (
-                                <div key={resp.id} className="p-4 rounded-xl border border-white/5 bg-neutral-900/10 flex items-center justify-between hover:bg-white/5 transition-colors">
+                                <Link
+                                    key={resp.id}
+                                    href={`/responses/${resp.id}`}
+                                    className="p-4 rounded-xl border border-white/5 bg-neutral-900/10 flex items-center justify-between hover:bg-white/5 transition-colors group"
+                                >
                                     <div className="flex items-center gap-4">
                                         <div className="w-10 h-10 rounded-lg bg-neutral-900 border border-white/5 flex items-center justify-center font-bold text-xs text-white">
                                             {resp.score?.toFixed(1)}
                                         </div>
                                         <div>
-                                            <h4 className="text-sm font-semibold text-neutral-200">Finished Drills</h4>
+                                            <h4 className="text-sm font-semibold text-neutral-200 group-hover:text-white transition-colors">Architectural Analysis</h4>
                                             <p className="text-[11px] text-neutral-500 uppercase tracking-widest font-bold mt-1">
                                                 {new Date(resp.submitted_at).toLocaleDateString()}
                                             </p>
                                         </div>
                                     </div>
-                                    <button className="p-2 text-neutral-600 hover:text-white transition-colors">
+                                    <div className="p-2 text-neutral-600 group-hover:text-white transition-colors">
                                         <ArrowUpRight className="w-4 h-4" />
-                                    </button>
-                                </div>
+                                    </div>
+                                </Link>
                             )) : (
                                 <div className="p-8 text-center border border-white/5 rounded-xl text-neutral-600 text-xs font-medium">
                                     No activity recorded yet.
@@ -136,6 +140,22 @@ export default function Dashboard() {
 
                 {/* Sidebar Stats */}
                 <div className="space-y-6">
+                    {/* Thinking Drills Card */}
+                    <section className="p-5 rounded-2xl border border-white/10 bg-white/[0.02] relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 p-4 opacity-[0.05] group-hover:scale-110 transition-transform duration-700">
+                            <BrainCircuit className="w-16 h-16" />
+                        </div>
+                        <div className="relative z-10">
+                            <h3 className="text-[11px] font-black uppercase tracking-[0.2em] mb-4 text-white">Intuition Warmup</h3>
+                            <p className="text-xs text-neutral-400 leading-relaxed mb-6">
+                                Sharpen your gut feeling with rapid-fire engineering drills.
+                            </p>
+                            <Link href="/drills" className="w-full py-2.5 rounded-lg bg-white text-black text-[10px] font-black uppercase tracking-widest text-center block hover:bg-neutral-200 transition-colors">
+                                START DRILLS
+                            </Link>
+                        </div>
+                    </section>
+
                     <section className="p-5 rounded-2xl border border-white/5 bg-neutral-900/10">
                         <h3 className="text-[12px] font-bold uppercase tracking-widest mb-6 flex items-center gap-2">
                             <TrendingUp className="w-4 h-4 text-white" />
