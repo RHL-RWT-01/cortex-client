@@ -19,6 +19,7 @@ import { useParams, useRouter } from 'next/navigation';
 import api from '@/lib/api';
 import { Task } from '@/lib/types';
 import ArchitectureEditor from '@/components/ArchitectureEditor';
+import { toast } from 'sonner';
 
 const steps = [
     { id: 'assumptions', label: 'Assumptions', icon: Lightbulb },
@@ -52,6 +53,7 @@ export default function TaskWorkspace() {
                 setTask(response.data);
             } catch (err) {
                 console.error('Failed to fetch task:', err);
+                toast.error('Failed to load task details');
             } finally {
                 setLoading(false);
             }
@@ -75,11 +77,12 @@ export default function TaskWorkspace() {
                 trade_offs: answers['trade-offs'],
                 failure_scenarios: answers['failure-modes']
             });
+            toast.success('Analysis submitted successfully!');
             // Redirect to dashboard or response view
             router.push('/dashboard');
         } catch (err) {
             console.error('Submission failed:', err);
-            alert('Failed to submit. Please try again.');
+            toast.error('Failed to submit. Please try again.');
         } finally {
             setSubmitting(false);
         }

@@ -17,6 +17,8 @@ export const metadata: Metadata = {
   keywords: ["engineering", "system design", "critical thinking", "architecture", "training", "AI"],
 };
 
+import { Toaster } from "sonner";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -28,6 +30,7 @@ export default function RootLayout({
         <AppLayout>
           {children}
         </AppLayout>
+        <Toaster position="bottom-right" theme="dark" closeButton richColors />
       </body>
     </html>
   );

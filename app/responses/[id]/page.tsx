@@ -21,6 +21,7 @@ import { useParams } from 'next/navigation';
 import api from '@/lib/api';
 import { TaskResponse, Task } from '@/lib/types';
 import MermaidRenderer from '@/components/MermaidRenderer';
+import { toast } from 'sonner';
 
 export default function ResponseDetail() {
     const params = useParams();
@@ -73,11 +74,12 @@ export default function ResponseDetail() {
         try {
             setRequestingFeedback(true);
             await api.post(`/responses/${responseId}/feedback`);
+            toast.success('Feedback generated successfully!');
             // Refresh to get the new feedback
             await fetchData();
         } catch (err: any) {
             console.error('Failed to request feedback:', err);
-            alert(err.response?.data?.detail || 'Wait for cooldown to expire');
+            toast.error(err.response?.data?.detail || 'Wait for cooldown to expire');
         } finally {
             setRequestingFeedback(false);
         }

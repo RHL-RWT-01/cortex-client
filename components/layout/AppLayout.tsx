@@ -10,13 +10,12 @@ import {
     Terminal,
     BrainCircuit,
     Trophy,
-    Settings,
     LogOut,
-    ChevronRight,
     User,
     Zap,
     Menu,
-    X
+    X,
+    ShieldCheck
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -116,18 +115,26 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                             </Link>
                         );
                     })}
+
+                    {user?.is_admin && (
+                        <Link href="/admin">
+                            <div className={`
+                  flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 group
+                  ${pathname === '/admin'
+                                    ? 'bg-white/10 text-white'
+                                    : 'text-neutral-500 hover:bg-neutral-900 hover:text-neutral-200'
+                                }
+                `}>
+                                <ShieldCheck className="w-4.5 h-4.5 shrink-0 text-amber-500/80" />
+                                {isSidebarOpen && (
+                                    <span className="text-[13px] font-medium whitespace-nowrap">Admin Panel</span>
+                                )}
+                            </div>
+                        </Link>
+                    )}
                 </nav>
 
                 <div className="p-3 border-t border-white/5 space-y-1">
-                    <Link href="/admin">
-                        <div className={`
-              flex items-center gap-3 px-3 py-2 rounded-lg text-neutral-500 hover:bg-neutral-900 hover:text-neutral-200 transition-all group
-              ${isSidebarOpen ? '' : 'justify-center'}
-            `}>
-                            <Settings className="w-4.5 h-4.5 shrink-0" />
-                            {isSidebarOpen && <span className="text-[13px] font-medium">Admin Ops</span>}
-                        </div>
-                    </Link>
                     <Link href="/profile">
                         <div className={`
               flex items-center gap-3 px-3 py-2 rounded-lg text-neutral-500 hover:bg-neutral-900 hover:text-neutral-200 transition-all group
@@ -157,6 +164,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                         <button
                             onClick={() => setMobileMenuOpen(true)}
                             className="lg:hidden p-2 -ml-2 text-neutral-400 hover:text-white"
+                        >
+                            <Menu className="w-5 h-5" />
+                        </button>
+                        <button
+                            onClick={() => setSidebarOpen(!isSidebarOpen)}
+                            className="hidden lg:flex p-2 -ml-2 text-neutral-400 hover:text-white transition-colors"
                         >
                             <Menu className="w-5 h-5" />
                         </button>

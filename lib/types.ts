@@ -6,6 +6,7 @@ export interface User {
     id: string;
     email: string;
     full_name: string;
+    is_admin: boolean;
     selected_role: Role | null;
     created_at: string;
     last_login: string;

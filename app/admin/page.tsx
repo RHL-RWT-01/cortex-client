@@ -1,22 +1,22 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import api from '@/lib/api';
 import {
-    LayoutDashboard,
+    AlertCircle,
+    ArrowUpRight,
+    BarChart3,
+    BrainCircuit,
+    CheckCircle2,
+    FileText,
+    Loader2,
     Plus,
     RefreshCw,
     Users,
-    FileText,
-    BrainCircuit,
-    BarChart3,
-    ArrowUpRight,
-    Loader2,
-    CheckCircle2,
-    AlertCircle,
     Zap
 } from 'lucide-react';
-import api from '@/lib/api';
+import { useEffect, useState } from 'react';
+import { useUser } from '@/hooks/use-user';
+import { useRouter } from 'next/navigation';
 
 interface AdminStats {
     total_users: number;
@@ -26,6 +26,8 @@ interface AdminStats {
 }
 
 export default function AdminDashboard() {
+    const { user, loading: userLoading } = useUser();
+    const router = useRouter();
     const [stats, setStats] = useState<AdminStats | null>(null);
     const [loading, setLoading] = useState(true);
     const [generating, setGenerating] = useState<string | null>(null);
@@ -43,8 +45,14 @@ export default function AdminDashboard() {
     };
 
     useEffect(() => {
-        fetchStats();
-    }, []);
+        if (!userLoading) {
+            if (!user || !user.is_admin) {
+                router.push('/');
+                return;
+            }
+            fetchStats();
+        }
+    }, [user, userLoading, router]);
 
     const handleGenerateDaily = async () => {
         try {
@@ -72,7 +80,7 @@ export default function AdminDashboard() {
         }
     };
 
-    if (loading) {
+    if (loading || userLoading) {
         return (
             <div className="h-screen flex items-center justify-center">
                 <Loader2 className="w-6 h-6 animate-spin text-neutral-500" />
