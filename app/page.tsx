@@ -5,7 +5,6 @@ import { motion } from 'framer-motion';
 import {
   ArrowRight,
   BrainCircuit,
-  ChevronRight,
   Cpu,
   Plus,
   Star,
@@ -25,7 +24,7 @@ export default function LandingPage() {
       <div className="fixed inset-0 -z-10 hero-gradient" />
 
       {/* Floating Navigation */}
-      <nav className="fixed top-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2 flex items-center gap-8 glass-nav rounded-full shadow-2xl">
+      <nav className="fixed top-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2 flex items-center gap-8 glass-nav rounded-full border border-white/20 shadow-2xl">
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 bg-white rounded flex items-center justify-center">
             <Zap className="w-3.5 h-3.5 text-black fill-black" />
