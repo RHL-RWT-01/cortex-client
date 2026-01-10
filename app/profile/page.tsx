@@ -193,13 +193,13 @@ export default function ProfilePage() {
                             </label>
                             {isEditing ? (
                                 <ProfileDropdown
-                                    label={formData.selected_level || 'Select Level'}
-                                    items={['Beginner', 'Intermediate', 'Advanced']}
+                                    label={formData.selected_level ? formData.selected_level.charAt(0).toUpperCase() + formData.selected_level.slice(1) : 'Select Level'}
+                                    items={['beginner', 'intermediate', 'advanced']}
                                     onSelect={(val) => setFormData({ ...formData, selected_level: (val as Difficulty) || null })}
                                     placeholder="Select Level"
                                 />
                             ) : (
-                                <p className="text-sm font-medium text-white">{user.selected_level || 'No level selected'}</p>
+                                <p className="text-sm font-medium text-white">{user.selected_level ? user.selected_level.charAt(0).toUpperCase() + user.selected_level.slice(1) : 'No level selected'}</p>
                             )}
                         </div>
                     </div>
@@ -242,6 +242,12 @@ export default function ProfilePage() {
 function ProfileDropdown({ label, items, onSelect, placeholder }: { label: string, items: string[], onSelect: (val: string) => void, placeholder: string }) {
     const [isOpen, setIsOpen] = useState(false);
 
+    // Helper to capitalize first letter for display
+    const capitalize = (text: string) => {
+        if (!text) return text;
+        return text.charAt(0).toUpperCase() + text.slice(1);
+    };
+
     return (
         <div className="relative">
             <button
@@ -273,9 +279,9 @@ function ProfileDropdown({ label, items, onSelect, placeholder }: { label: strin
                                     onSelect(item);
                                     setIsOpen(false);
                                 }}
-                                className={`w-full text-left px-4 py-2 text-[11px] font-bold tracking-widest uppercase hover:bg-white/5 transition-colors ${label === item ? 'text-white bg-white/5' : 'text-neutral-500'}`}
+                                className={`w-full text-left px-4 py-2 text-[11px] font-bold tracking-widest uppercase hover:bg-white/5 transition-colors ${label === capitalize(item) ? 'text-white bg-white/5' : 'text-neutral-500'}`}
                             >
-                                {item}
+                                {capitalize(item)}
                             </button>
                         ))}
                     </div>

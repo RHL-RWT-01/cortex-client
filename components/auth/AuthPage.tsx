@@ -25,7 +25,7 @@ export default function AuthPage({ mode = 'login' }: { mode?: 'login' | 'signup'
         password: '',
         fullName: '',
         role: 'Backend Engineer',
-        level: 'Beginner'
+        level: 'beginner'
     });
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -147,9 +147,9 @@ export default function AuthPage({ mode = 'login' }: { mode?: 'login' | 'signup'
                                             onChange={(e) => setFormData({ ...formData, level: e.target.value })}
                                             className="w-full bg-black/40 border border-white/5 rounded-2xl px-4 py-3 text-sm text-white focus:outline-none focus:border-white/20 transition-all appearance-none font-medium cursor-pointer placeholder:text-neutral-700 hover:bg-black/60"
                                         >
-                                            <option value="Beginner">Beginner</option>
-                                            <option value="Intermediate">Intermediate</option>
-                                            <option value="Advanced">Advanced</option>
+                                            <option value="beginner">Beginner</option>
+                                            <option value="intermediate">Intermediate</option>
+                                            <option value="advanced">Advanced</option>
                                         </select>
                                         <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-neutral-500">
                                             <ArrowRight className="w-4 h-4 rotate-90" />

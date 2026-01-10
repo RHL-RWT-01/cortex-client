@@ -2,6 +2,7 @@
 
 import { useTasks } from '@/hooks/use-tasks';
 import { useUser } from '@/hooks/use-user';
+import { Difficulty, Role } from '@/lib/types';
 import { motion } from 'framer-motion';
 import {
     ArrowRight,
@@ -14,13 +15,16 @@ import {
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
-const roles = ['All Roles', 'Backend Engineer', 'Frontend Engineer', 'Fullstack Engineer', 'Systems Engineer', 'Data Engineer', 'DevOps Engineer', 'Security Engineer'];
-const difficulties = ['All Levels', 'Beginner', 'Intermediate', 'Advanced'];
+const roles = ['All Roles', 'Backend Engineer', 'Frontend Engineer', 'Fullstack Engineer', 'Systems Engineer', 'Data Engineer', 'DevOps Engineer', 'Security Engineer'] as const;
+const difficulties = ['All Levels', 'beginner', 'intermediate', 'advanced'] as const;
+
+type DifficultyFilter = typeof difficulties[number];
+type RoleFilter = typeof roles[number];
 
 export default function TasksPage() {
     const user = useUser();
-    const [selectedRole, setSelectedRole] = useState('All Roles');
-    const [selectedDiff, setSelectedDiff] = useState('All Levels');
+    const [selectedRole, setSelectedRole] = useState<RoleFilter>('All Roles');
+    const [selectedDiff, setSelectedDiff] = useState<DifficultyFilter>('All Levels');
     const [searchQuery, setSearchQuery] = useState('');
 
     const roleParam = selectedRole === 'All Roles' ? undefined : selectedRole;
@@ -34,7 +38,13 @@ export default function TasksPage() {
     );
     useEffect(() => {
         setSelectedRole(user.user?.selected_role || 'All Roles');
-        setSelectedDiff(user.user?.selected_level || 'All Levels');
+        // Convert selected_level to lowercase if it exists
+        const userLevel = user.user?.selected_level;
+        if (userLevel) {
+            setSelectedDiff(userLevel as DifficultyFilter);
+        } else {
+            setSelectedDiff('All Levels');
+        }
     }, [user]);
 
     return (
@@ -58,8 +68,8 @@ export default function TasksPage() {
                         />
                     </div>
 
-                    <FilterDropdown label={selectedRole} items={roles} onSelect={setSelectedRole} />
-                    <FilterDropdown label={selectedDiff} items={difficulties} onSelect={setSelectedDiff} />
+                    <FilterDropdown label={selectedRole} items={roles} onSelect={(val) => setSelectedRole(val)} />
+                    <FilterDropdown label={selectedDiff} items={difficulties} onSelect={(val) => setSelectedDiff(val)} />
                 </div>
             </div>
 
@@ -124,8 +134,14 @@ export default function TasksPage() {
     );
 }
 
-function FilterDropdown({ label, items, onSelect }: { label: string, items: string[], onSelect: (val: string) => void }) {
+function FilterDropdown<T extends string>({ label, items, onSelect }: { label: T, items: readonly T[], onSelect: (val: T) => void }) {
     const [isOpen, setIsOpen] = useState(false);
+
+    // Helper to capitalize first letter for display
+    const formatLabel = (text: string) => {
+        if (text === 'All Levels' || text === 'All Roles') return text;
+        return text.charAt(0).toUpperCase() + text.slice(1);
+    };
 
     return (
         <div className="relative">
@@ -133,7 +149,7 @@ function FilterDropdown({ label, items, onSelect }: { label: string, items: stri
                 onClick={() => setIsOpen(!isOpen)}
                 className="bg-neutral-900 border border-white/5 rounded-lg px-3.5 py-2 text-[11px] font-bold uppercase tracking-widest flex items-center gap-2 hover:bg-neutral-800 transition-colors"
             >
-                {label}
+                {formatLabel(label)}
                 <ChevronDown className={`w-3 h-3 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
             </button>
 
@@ -150,7 +166,7 @@ function FilterDropdown({ label, items, onSelect }: { label: string, items: stri
                                 }}
                                 className={`w-full text-left px-4 py-2 text-[11px] font-bold tracking-widest uppercase hover:bg-white/5 transition-colors ${label === item ? 'text-white bg-white/5' : 'text-neutral-500'}`}
                             >
-                                {item}
+                                {formatLabel(item)}
                             </button>
                         ))}
                     </div>
