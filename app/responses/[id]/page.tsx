@@ -2,6 +2,7 @@
 
 import MermaidRenderer from '@/components/MermaidRenderer';
 import api from '@/lib/api';
+import { parseApiError } from '@/lib/error-utils';
 import { Task, TaskResponse } from '@/lib/types';
 import {
     Activity,
@@ -81,7 +82,7 @@ export default function ResponseDetail() {
             await fetchData();
         } catch (err: any) {
             console.error('Failed to request feedback:', err);
-            toast.error(err.response?.data?.detail || 'Retry after cooldown');
+            toast.error(parseApiError(err, 'Retry after cooldown'));
         } finally {
             setRequestingFeedback(false);
         }
@@ -215,20 +216,20 @@ export default function ResponseDetail() {
                             <div className="relative z-10 prose prose-invert prose-lg max-w-none">
                                 {response.ai_feedback ? (
                                     <div className="text-neutral-300 space-y-4">
-                                        <ReactMarkdown 
+                                        <ReactMarkdown
                                             remarkPlugins={[remarkGfm]}
                                             components={{
-                                                h1: ({node, ...props}) => <h1 className="text-2xl font-black text-white uppercase tracking-tight mt-6 mb-4" {...props} />,
-                                                h2: ({node, ...props}) => <h2 className="text-lg font-black text-white uppercase tracking-widest mt-6 mb-3 border-b border-white/10 pb-2 flex items-center gap-2" {...props} />,
-                                                h3: ({node, ...props}) => <h3 className="text-sm font-bold text-white mt-4 mb-2 uppercase tracking-wider" {...props} />,
-                                                p: ({node, ...props}) => <p className="leading-relaxed text-[15px] font-medium" {...props} />,
-                                                ul: ({node, ...props}) => <ul className="list-disc pl-5 space-y-2 my-4 marker:text-emerald-500" {...props} />,
-                                                ol: ({node, ...props}) => <ol className="list-decimal pl-5 space-y-2 my-4 marker:text-emerald-500" {...props} />,
-                                                li: ({node, ...props}) => <li className="pl-1" {...props} />,
-                                                blockquote: ({node, ...props}) => <blockquote className="border-l-2 border-emerald-500 pl-4 py-1 my-4 bg-emerald-500/5 italic text-emerald-400 rounded-r-lg" {...props} />,
-                                                strong: ({node, ...props}) => <strong className="text-white font-bold" {...props} />,
-                                                code: ({node, ...props}) => <code className="bg-white/10 px-1.5 py-0.5 rounded text-sm font-mono text-emerald-400" {...props} />,
-                                                pre: ({node, ...props}) => <pre className="bg-black/50 p-4 rounded-xl overflow-x-auto border border-white/10 my-4" {...props} />,
+                                                h1: ({ node, ...props }) => <h1 className="text-2xl font-black text-white uppercase tracking-tight mt-6 mb-4" {...props} />,
+                                                h2: ({ node, ...props }) => <h2 className="text-lg font-black text-white uppercase tracking-widest mt-6 mb-3 border-b border-white/10 pb-2 flex items-center gap-2" {...props} />,
+                                                h3: ({ node, ...props }) => <h3 className="text-sm font-bold text-white mt-4 mb-2 uppercase tracking-wider" {...props} />,
+                                                p: ({ node, ...props }) => <p className="leading-relaxed text-[15px] font-medium" {...props} />,
+                                                ul: ({ node, ...props }) => <ul className="list-disc pl-5 space-y-2 my-4 marker:text-emerald-500" {...props} />,
+                                                ol: ({ node, ...props }) => <ol className="list-decimal pl-5 space-y-2 my-4 marker:text-emerald-500" {...props} />,
+                                                li: ({ node, ...props }) => <li className="pl-1" {...props} />,
+                                                blockquote: ({ node, ...props }) => <blockquote className="border-l-2 border-emerald-500 pl-4 py-1 my-4 bg-emerald-500/5 italic text-emerald-400 rounded-r-lg" {...props} />,
+                                                strong: ({ node, ...props }) => <strong className="text-white font-bold" {...props} />,
+                                                code: ({ node, ...props }) => <code className="bg-white/10 px-1.5 py-0.5 rounded text-sm font-mono text-emerald-400" {...props} />,
+                                                pre: ({ node, ...props }) => <pre className="bg-black/50 p-4 rounded-xl overflow-x-auto border border-white/10 my-4" {...props} />,
                                             }}
                                         >
                                             {response.ai_feedback}

@@ -1,4 +1,5 @@
 import api from '@/lib/api';
+import { parseApiError } from '@/lib/error-utils';
 import { Task } from '@/lib/types';
 import { useEffect, useState } from 'react';
 
@@ -19,7 +20,7 @@ export function useTasks(role?: string, difficulty?: string) {
                 setTasks(response.data);
                 setError(null);
             } catch (err: any) {
-                setError(err.response?.data?.detail || 'Failed to fetch tasks');
+                setError(parseApiError(err, 'Failed to fetch tasks'));
             } finally {
                 setLoading(false);
             }
@@ -45,7 +46,7 @@ export function useDailyChallenge() {
                 setTask(response.data);
                 setError(null);
             } catch (err: any) {
-                setError(err.response?.data?.detail || 'Failed to fetch daily challenge');
+                setError(parseApiError(err, 'Failed to fetch daily challenge'));
             } finally {
                 setLoading(false);
             }

@@ -13,7 +13,7 @@ import {
     Search
 } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const roles = ['All Roles', 'Backend Engineer', 'Frontend Engineer', 'Fullstack Engineer', 'Systems Engineer', 'Data Engineer', 'DevOps Engineer', 'Security Engineer'] as const;
 const difficulties = ['All Levels', 'beginner', 'intermediate', 'advanced'] as const;
@@ -26,6 +26,7 @@ export default function TasksPage() {
     const [selectedRole, setSelectedRole] = useState<RoleFilter>('All Roles');
     const [selectedDiff, setSelectedDiff] = useState<DifficultyFilter>('All Levels');
     const [searchQuery, setSearchQuery] = useState('');
+    const hasInitialized = useRef(false);
 
     const roleParam = selectedRole === 'All Roles' ? undefined : selectedRole;
     const diffParam = selectedDiff === 'All Levels' ? undefined : selectedDiff;
@@ -36,16 +37,22 @@ export default function TasksPage() {
         t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         t.description.toLowerCase().includes(searchQuery.toLowerCase())
     );
+
+    // Only initialize filters once from user preferences
     useEffect(() => {
-        setSelectedRole(user.user?.selected_role || 'All Roles');
-        // Convert selected_level to lowercase if it exists
-        const userLevel = user.user?.selected_level;
-        if (userLevel) {
-            setSelectedDiff(userLevel as DifficultyFilter);
-        } else {
-            setSelectedDiff('All Levels');
+        if (!hasInitialized.current && user.user) {
+            setSelectedRole(user.user.selected_role || 'All Roles');
+            // Convert selected_level to lowercase to handle legacy capitalized values
+            const userLevel = user.user.selected_level;
+            if (userLevel) {
+                // Convert to lowercase to match backend expectations
+                setSelectedDiff(userLevel.toLowerCase() as DifficultyFilter);
+            } else {
+                setSelectedDiff('All Levels');
+            }
+            hasInitialized.current = true;
         }
-    }, [user]);
+    }, [user.user]);
 
     return (
         <div className="space-y-8 py-4">

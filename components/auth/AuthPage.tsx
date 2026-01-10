@@ -2,6 +2,7 @@
 
 import { useUser } from '@/hooks/use-user';
 import api from '@/lib/api';
+import { parseApiError } from '@/lib/error-utils';
 import { motion } from 'framer-motion';
 import { ArrowRight, ChevronLeft, Loader2, Zap } from 'lucide-react';
 import Link from 'next/link';
@@ -52,7 +53,7 @@ export default function AuthPage({ mode = 'login' }: { mode?: 'login' | 'signup'
             }
             router.push('/dashboard');
         } catch (err: any) {
-            setError(err.response?.data?.detail || 'Authentication failed. Please check your credentials.');
+            setError(parseApiError(err, 'Authentication failed. Please check your credentials.'));
         } finally {
             setLoading(false);
         }

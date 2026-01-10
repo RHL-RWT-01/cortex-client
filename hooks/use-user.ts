@@ -1,6 +1,7 @@
 "use client";
 
 import api from '@/lib/api';
+import { parseApiError } from '@/lib/error-utils';
 import { User } from '@/lib/types';
 import { useEffect, useState } from 'react';
 
@@ -23,7 +24,7 @@ export function useUser() {
             setError(null);
         } catch (err: any) {
             console.error('Failed to fetch user:', err);
-            setError(err.response?.data?.detail || 'Failed to load profile');
+            setError(parseApiError(err, 'Failed to load profile'));
             // If token is invalid, clear it
             if (err.response?.status === 401) {
                 localStorage.removeItem('cortex_token');

@@ -1,4 +1,5 @@
 import api from '@/lib/api';
+import { parseApiError } from '@/lib/error-utils';
 import { ProgressStats, TaskResponse } from '@/lib/types';
 import { useEffect, useState } from 'react';
 
@@ -20,7 +21,7 @@ export function useProgress() {
                 setHistory(historyRes.data);
                 setError(null);
             } catch (err: any) {
-                setError(err.response?.data?.detail || 'Failed to fetch progress');
+                setError(parseApiError(err, 'Failed to fetch progress'));
             } finally {
                 setLoading(false);
             }
