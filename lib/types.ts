@@ -1,5 +1,5 @@
 export type Role = 'Backend Engineer' | 'Frontend Engineer' | 'Fullstack Engineer' | 'Systems Engineer' | 'Data Engineer' | 'DevOps Engineer' | 'Security Engineer';
-export type Difficulty = 'Beginner' | 'Intermediate' | 'Advanced';
+export type Difficulty = 'beginner' | 'intermediate' | 'advanced';
 export type DrillType = 'spot_assumptions' | 'rank_failures' | 'predict_scaling' | 'choose_tradeoffs';
 
 export interface User {

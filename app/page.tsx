@@ -1,6 +1,7 @@
 "use client";
 
 import { useUser } from '@/hooks/use-user';
+import api from '@/lib/api';
 import { motion } from 'framer-motion';
 import {
   ArrowRight,
@@ -13,9 +14,19 @@ import {
   Zap
 } from 'lucide-react';
 import Link from 'next/link';
+import { useEffect } from 'react';
 
 export default function LandingPage() {
   const { user, loading } = useUser();
+
+  useEffect(() => {
+    async function upServer() {
+      await api.get("/health").then((res) => {
+        console.log(res)
+      })
+    }
+    upServer()
+  }, [])
 
   return (
     <div className="min-h-screen bg-black text-white selection:bg-white selection:text-black overflow-x-hidden font-sans">
