@@ -70,3 +70,35 @@ export interface ProgressStats {
     total_score: number;
     average_score: number;
 }
+
+// Subscription types
+export type SubscriptionPlan = 'free' | 'pro';
+export type SubscriptionStatus = 'active' | 'cancelled' | 'on_hold' | 'expired';
+
+export interface Subscription {
+    plan: SubscriptionPlan;
+    status: SubscriptionStatus;
+    current_period_end?: string;
+}
+
+export interface UsageLimits {
+    plan: SubscriptionPlan;
+    tasks_used: number;
+    tasks_limit: number;
+    can_submit_task: boolean;
+    drills_used_today: number;
+    drills_limit: number;
+    can_submit_drill: boolean;
+}
+
+export interface CheckoutResponse {
+    checkout_url: string;
+    payment_link: string;
+}
+
+// API error with upgrade requirement
+export interface UpgradeRequiredError {
+    message: string;
+    upgrade_required: boolean;
+    error_code: 'TASK_LIMIT_EXCEEDED' | 'DRILL_LIMIT_EXCEEDED';
+}

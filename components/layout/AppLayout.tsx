@@ -1,10 +1,13 @@
 "use client";
 
 import { useProgress } from '@/hooks/use-progress';
+import { useSubscription } from '@/hooks/use-subscription';
 import { useUser } from '@/hooks/use-user';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
     BrainCircuit,
+    CreditCard,
+    Crown,
     Globe,
     LayoutDashboard,
     LogOut,
@@ -24,6 +27,7 @@ const sidebarItems = [
     { name: 'Engineering Tasks', icon: Terminal, href: '/tasks' },
     { name: 'Thinking Drills', icon: BrainCircuit, href: '/drills' },
     { name: 'Achievements', icon: Trophy, href: '/achievements' },
+    { name: 'Pricing', icon: CreditCard, href: '/pricing' },
 ];
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -33,6 +37,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     const router = useRouter();
     const { user } = useUser();
     const { stats } = useProgress();
+    const { subscription, isPro } = useSubscription();
 
     const getRank = (score: number) => {
         if (score >= 9) return "Principal Architect";
@@ -50,7 +55,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     };
 
     // If we are on public pages, we don't want the sidebar
-    const isPublicPage = pathname === '/' || pathname === '/login' || pathname === '/signup';
+    const isPublicPage = pathname === '/' || pathname === '/login' || pathname === '/signup' || pathname === '/pricing';
 
     if (isPublicPage) {
         return <>{children}</>;
@@ -194,6 +199,18 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                         </div>
 
                         <div className="flex items-center gap-5">
+                            {/* Subscription Badge */}
+                            {isPro ? (
+                                <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20">
+                                    <Crown className="w-3.5 h-3.5 text-amber-400" />
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-amber-400">Pro</span>
+                                </div>
+                            ) : (
+                                <Link href="/pricing" className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 hover:border-white/20 transition-colors">
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-neutral-500">Free</span>
+                                </Link>
+                            )}
+
                             <div className="text-right hidden md:block">
                                 <p className="text-[12px] font-black text-white leading-none uppercase tracking-widest">{user?.full_name || 'Architect'}</p>
                                 <p className="text-[9px] text-neutral-500 mt-1.5 font-bold uppercase tracking-wider">{user?.selected_role || userRank}</p>

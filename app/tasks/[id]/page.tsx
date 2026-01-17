@@ -1,6 +1,9 @@
 "use client";
 
 import ArchitectureEditor from '@/components/ArchitectureEditor';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import UpgradeModal from '@/components/UpgradeModal';
+import { useSubscription } from '@/hooks/use-subscription';
 import api from '@/lib/api';
 import { Task } from '@/lib/types';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -23,7 +26,6 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import ProtectedRoute from '@/components/ProtectedRoute';
 
 const steps = [
     { id: 'assumptions', label: 'Assumptions', icon: Lightbulb },
@@ -42,6 +44,10 @@ export default function TaskWorkspace() {
     const [submitting, setSubmitting] = useState(false);
     const [activeTab, setActiveTab] = useState('assumptions');
     const [isMaximized, setIsMaximized] = useState(false);
+    const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+    const [limitMessage, setLimitMessage] = useState('');
+
+    const { canSubmitTask, createCheckout, refreshUsage } = useSubscription();
 
     const [answers, setAnswers] = useState({
         assumptions: '',
@@ -72,6 +78,13 @@ export default function TaskWorkspace() {
     };
 
     const handleSubmit = async () => {
+        // Check task limit before submitting
+        if (!canSubmitTask) {
+            setLimitMessage("You've used your free task. Upgrade to Pro for 5 tasks per day!");
+            setShowUpgradeModal(true);
+            return;
+        }
+
         try {
             setSubmitting(true);
             await api.post('/responses', {
@@ -84,10 +97,18 @@ export default function TaskWorkspace() {
                 failure_scenarios: answers['failure-modes']
             });
             toast.success('Analysis submitted successfully!');
+            await refreshUsage(); // Refresh usage after submission
             router.push('/dashboard');
-        } catch (err) {
-            console.error('Submission failed:', err);
-            toast.error('Failed to submit. Please try again.');
+        } catch (err: any) {
+            // Check if it's an upgrade required error
+            const detail = err.response?.data?.detail;
+            if (detail?.upgrade_required) {
+                setLimitMessage(detail.message || "You've reached your task limit.");
+                setShowUpgradeModal(true);
+            } else {
+                console.error('Submission failed:', err);
+                toast.error('Failed to submit. Please try again.');
+            }
         } finally {
             setSubmitting(false);
         }
@@ -326,6 +347,15 @@ export default function TaskWorkspace() {
                     </div>
                 </div>
             </div>
+
+            {/* Upgrade Modal */}
+            <UpgradeModal
+                isOpen={showUpgradeModal}
+                onClose={() => setShowUpgradeModal(false)}
+                onUpgrade={createCheckout}
+                limitType="task"
+                message={limitMessage}
+            />
         </ProtectedRoute>
     );
 }

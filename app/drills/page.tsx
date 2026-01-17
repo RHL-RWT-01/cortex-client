@@ -2,6 +2,8 @@
 
 import api from '@/lib/api';
 import { Drill } from '@/lib/types';
+import { useSubscription } from '@/hooks/use-subscription';
+import UpgradeModal from '@/components/UpgradeModal';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
     BrainCircuit,
@@ -21,6 +23,10 @@ export default function DrillsPage() {
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [result, setResult] = useState<{ is_correct: boolean, explanation: string, correct_answer: string } | null>(null);
+    const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+    const [limitMessage, setLimitMessage] = useState('');
+
+    const { canSubmitDrill, createCheckout, refreshUsage } = useSubscription();
 
     const fetchDrill = async () => {
         try {
@@ -43,6 +49,14 @@ export default function DrillsPage() {
 
     const handleSubmit = async () => {
         if (!drill || !selectedOption) return;
+
+        // Check drill limit before submitting
+        if (!canSubmitDrill) {
+            setLimitMessage("You've used your daily free drill. Upgrade to Pro for unlimited drills!");
+            setShowUpgradeModal(true);
+            return;
+        }
+
         try {
             const response = await api.post('/drills/submit', {
                 drill_id: drill.id,
@@ -50,8 +64,16 @@ export default function DrillsPage() {
             });
             setResult(response.data);
             setIsSubmitted(true);
-        } catch (err) {
-            console.error('Submission failed:', err);
+            await refreshUsage(); // Refresh usage after submission
+        } catch (err: any) {
+            // Check if it's an upgrade required error
+            const detail = err.response?.data?.detail;
+            if (detail?.upgrade_required) {
+                setLimitMessage(detail.message || "You've reached your drill limit.");
+                setShowUpgradeModal(true);
+            } else {
+                console.error('Submission failed:', err);
+            }
         }
     };
 
@@ -196,6 +218,15 @@ export default function DrillsPage() {
                     )}
                 </AnimatePresence>
             </div>
+
+            {/* Upgrade Modal */}
+            <UpgradeModal
+                isOpen={showUpgradeModal}
+                onClose={() => setShowUpgradeModal(false)}
+                onUpgrade={createCheckout}
+                limitType="drill"
+                message={limitMessage}
+            />
         </ProtectedRoute>
     );
 }
