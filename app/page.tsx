@@ -1,5 +1,6 @@
 "use client";
 
+import TermsModal from '@/components/TermsModal';
 import { useUser } from '@/hooks/use-user';
 import api from '@/lib/api';
 import { motion } from 'framer-motion';
@@ -14,10 +15,11 @@ import {
   Zap
 } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function LandingPage() {
   const { user, loading } = useUser();
+  const [showTermsModal, setShowTermsModal] = useState(false);
 
   useEffect(() => {
     async function upServer() {
@@ -162,6 +164,48 @@ export default function LandingPage() {
             </div>
             {/* Decorative element */}
             <div className="absolute -top-10 -right-10 w-32 h-32 bg-white/5 rounded-full blur-3xl -z-10" />
+          </motion.div>
+        </div>
+      </section>
+
+      {/* The Statement - Maximum Impact Quote */}
+      <section className="relative py-32 px-6 bg-black overflow-hidden">
+        {/* Subtle gradient orbs */}
+        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-emerald-500/[0.03] rounded-full blur-[120px]" />
+        <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-white/[0.02] rounded-full blur-[120px]" />
+
+        <div className="container-center relative">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            viewport={{ once: true, margin: "-100px" }}
+            className="max-w-5xl mx-auto text-center"
+          >
+            {/* Decorative quotation mark */}
+            <div className="mb-8">
+              <span className="text-8xl md:text-9xl font-serif text-white/[0.08] select-none leading-none">"</span>
+            </div>
+
+            {/* The Quote */}
+            <h2 className="text-3xl md:text-5xl lg:text-6xl font-serif text-white leading-[1.2] tracking-tight mb-8">
+              The closest thing to having a{' '}
+              <span className="italic text-emerald-400">staff engineer</span>{' '}
+              sitting next to you,{' '}
+              <br className="hidden md:block" />
+              questioning every decision.
+            </h2>
+
+            {/* Subtle attribution line */}
+            <motion.p
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ delay: 0.5, duration: 0.8 }}
+              viewport={{ once: true }}
+              className="text-neutral-500 text-sm uppercase tracking-[0.3em] font-medium"
+            >
+              The Cortex Experience
+            </motion.p>
           </motion.div>
         </div>
       </section>
@@ -402,75 +446,140 @@ export default function LandingPage() {
       {/* Pricing Section */}
       <section id="pricing" className="py-32 px-6 bg-gradient-to-b from-black via-neutral-950 to-black">
         <div className="container-center">
-          {/* Testimonial Quote */}
-          <div className="max-w-3xl mx-auto text-center mb-12">
-            <h2 className="text-emerald-500 text-2xl md:text-3xl font-medium italic leading-relaxed">
-              "The closest thing to having a staff engineer sitting next to you, questioning every decision."
-            </h2>
-          </div>
-
           <div className="max-w-3xl mx-auto text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-serif mb-6 text-white">Start Your Journey.</h2>
+            <h2 className="text-4xl md:text-5xl font-serif mb-6 text-white">Simple, Transparent Pricing.</h2>
             <p className="text-neutral-400 text-lg font-medium leading-relaxed">
-              Begin with free access to foundational scenarios. Upgrade as you grow to unlock advanced challenges and personalized AI feedback.
+              Start free, upgrade when you're ready to accelerate your growth.
             </p>
           </div>
 
-          <div className="max-w-2xl mx-auto">
-            <div className="p-10 rounded-3xl bg-gradient-to-br from-neutral-900 to-black border border-white/10 relative overflow-hidden">
-              {/* Decorative gradient */}
-              <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-
-              <div className="relative z-10">
-                <div className="flex items-center justify-between mb-8">
-                  <div>
-                    <h3 className="text-2xl font-serif text-white mb-2">Free Forever</h3>
-                    <p className="text-neutral-400 text-sm">Start learning immediately, no credit card required</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-5xl font-serif text-white">$0</p>
-                    <p className="text-neutral-500 text-sm">forever</p>
-                  </div>
+          {/* Pricing Cards */}
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {/* Trial Tier - De-emphasized */}
+            <motion.div
+              whileHover={{ y: -3 }}
+              className="p-8 rounded-3xl bg-neutral-900/30 border border-white/5 relative"
+            >
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
+                  <Zap className="w-5 h-5 text-neutral-500" />
                 </div>
-
-                <div className="grid md:grid-cols-2 gap-4 mb-8">
-                  {[
-                    'Access to core scenarios',
-                    'Progress tracking dashboard',
-                    'Community discussions',
-                    'Weekly challenges',
-                    'Skill assessments',
-                    'Learning resources'
-                  ].map((feature, i) => (
-                    <div key={i} className="flex items-start gap-3">
-                      <div className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                      </div>
-                      <span className="text-neutral-300 text-sm">{feature}</span>
-                    </div>
-                  ))}
+                <div>
+                  <h3 className="text-lg font-bold text-neutral-300">Trial</h3>
+                  <p className="text-xs text-neutral-600">Try before you commit</p>
                 </div>
-
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <Link
-                    href="/signup"
-                    className="flex-1 text-center bg-white text-black py-4 px-8 rounded-full text-sm font-bold hover:bg-neutral-200 transition-all"
-                  >
-                    Get Started Free
-                  </Link>
-                  <Link
-                    href="/login"
-                    className="flex-1 text-center bg-white/5 text-white py-4 px-8 rounded-full text-sm font-bold hover:bg-white/10 transition-all border border-white/10"
-                  >
-                    Sign In
-                  </Link>
-                </div>
-
-                <p className="text-center text-xs text-neutral-600 mt-6">
-                  Pro features with AI-powered feedback and unlimited scenarios coming soon
-                </p>
               </div>
-            </div>
+
+              <div className="mb-6">
+                <div className="flex items-baseline gap-1">
+                  <span className="text-3xl font-bold text-neutral-400">$0</span>
+                </div>
+                <p className="text-xs text-neutral-600 mt-1">One-time trial experience</p>
+              </div>
+
+              <ul className="space-y-3 mb-6 text-sm text-neutral-500">
+                <li className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-neutral-600" />
+                  <span>1 architecture task</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-neutral-600" />
+                  <span>1 drill per day</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-neutral-600" />
+                  <span>Basic AI feedback</span>
+                </li>
+              </ul>
+
+              <Link
+                href="/signup"
+                className="block w-full py-2.5 text-center border border-white/5 rounded-lg text-sm font-medium text-neutral-500 hover:text-neutral-300 hover:border-white/10 transition-all"
+              >
+                Start Free Trial
+              </Link>
+            </motion.div>
+
+            {/* Pro Tier */}
+            <motion.div
+              whileHover={{ y: -5 }}
+              className="relative p-8 rounded-3xl bg-gradient-to-b from-white/[0.08] to-white/[0.02] border border-white/10"
+            >
+              {/* Popular Badge */}
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                <span className="px-4 py-1 bg-white text-black text-[10px] font-black uppercase tracking-wider rounded-full shadow-lg">
+                  Most Popular
+                </span>
+              </div>
+
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center">
+                  <Trophy className="w-6 h-6 text-amber-400" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-white">Pro</h3>
+                  <p className="text-xs text-neutral-500">Full access</p>
+                </div>
+              </div>
+
+              <div className="mb-8">
+                <div className="flex items-baseline gap-1">
+                  <span className="text-4xl font-black text-white">$15</span>
+                  <span className="text-neutral-500">/month</span>
+                </div>
+              </div>
+
+              <ul className="space-y-4 mb-8">
+                <li className="flex items-center gap-3 text-sm">
+                  <div className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                    <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                  </div>
+                  <span className="text-white font-medium">5 tasks per day</span>
+                </li>
+                <li className="flex items-center gap-3 text-sm">
+                  <div className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                    <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                  </div>
+                  <span className="text-white font-medium">Unlimited drills</span>
+                </li>
+                <li className="flex items-center gap-3 text-sm">
+                  <div className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                    <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                  </div>
+                  <span className="text-neutral-300">Advanced AI coaching</span>
+                </li>
+                <li className="flex items-center gap-3 text-sm">
+                  <div className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                    <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                  </div>
+                  <span className="text-neutral-300">Full performance analytics</span>
+                </li>
+                <li className="flex items-center gap-3 text-sm">
+                  <div className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                    <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                  </div>
+                  <span className="text-neutral-300">Priority support</span>
+                </li>
+              </ul>
+
+              <Link
+                href="/pricing"
+                className="block w-full py-3 text-center bg-white text-black rounded-xl text-sm font-bold hover:bg-neutral-200 transition-all"
+              >
+                Upgrade to Pro
+              </Link>
+            </motion.div>
+          </div>
+
+          {/* View full pricing link */}
+          <div className="text-center mt-10">
+            <Link
+              href="/pricing"
+              className="inline-flex items-center gap-2 text-sm text-neutral-400 hover:text-white transition-colors font-medium"
+            >
+              View full pricing details
+              <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
         </div>
       </section>
@@ -490,12 +599,24 @@ export default function LandingPage() {
               The thinking lab for modern engineers.
             </p>
 
-            <p className="text-xs text-neutral-600">
-              © {new Date().getFullYear()} Cortex. All rights reserved.
-            </p>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => setShowTermsModal(true)}
+                className="text-xs text-neutral-600 hover:text-neutral-400 transition-colors"
+              >
+                Terms & Conditions
+              </button>
+              <span className="text-neutral-800">•</span>
+              <p className="text-xs text-neutral-600">
+                © {new Date().getFullYear()} Cortex
+              </p>
+            </div>
           </div>
         </div>
       </footer>
+
+      {/* Terms Modal */}
+      <TermsModal isOpen={showTermsModal} onClose={() => setShowTermsModal(false)} />
     </div>
   );
 }

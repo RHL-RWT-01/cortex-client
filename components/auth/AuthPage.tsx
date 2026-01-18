@@ -8,12 +8,15 @@ import { ArrowRight, ChevronLeft, Loader2, Zap } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
+import TermsModal from '@/components/TermsModal';
 
 export default function AuthPage({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
     const router = useRouter();
     const { user, loading: userLoading } = useUser();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [termsAccepted, setTermsAccepted] = useState(false);
+    const [showTermsModal, setShowTermsModal] = useState(false);
 
     useEffect(() => {
         if (!userLoading && user) {
@@ -189,10 +192,40 @@ export default function AuthPage({ mode = 'login' }: { mode?: 'login' | 'signup'
                             />
                         </div>
 
+                        {/* Terms & Conditions checkbox - signup only */}
+                        {mode === 'signup' && (
+                            <div className="flex items-start gap-3 mt-2">
+                                <button
+                                    type="button"
+                                    onClick={() => setTermsAccepted(!termsAccepted)}
+                                    className={`mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center transition-all cursor-pointer flex-shrink-0 ${termsAccepted
+                                            ? 'bg-white border-white'
+                                            : 'bg-transparent border-white/20 hover:border-white/40'
+                                        }`}
+                                >
+                                    {termsAccepted && (
+                                        <svg className="w-3 h-3 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    )}
+                                </button>
+                                <label className="text-xs text-neutral-500 leading-relaxed">
+                                    I agree to the{' '}
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowTermsModal(true)}
+                                        className="text-white hover:underline font-medium"
+                                    >
+                                        Terms & Conditions
+                                    </button>
+                                </label>
+                            </div>
+                        )}
+
                         <button
                             type="submit"
-                            disabled={loading}
-                            className="w-full bg-white text-black py-4 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-neutral-200 transition-all shadow-xl active:scale-[0.98] disabled:opacity-50 mt-4"
+                            disabled={loading || (mode === 'signup' && !termsAccepted)}
+                            className="w-full bg-white text-black py-4 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-neutral-200 transition-all shadow-xl active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed mt-4"
                         >
                             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
                             {mode === 'login' ? 'Sign in' : 'Create account'}
@@ -220,6 +253,9 @@ export default function AuthPage({ mode = 'login' }: { mode?: 'login' | 'signup'
                     <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-500">E3 DISTRIBUTED</span>
                 </div>
             </motion.div>
+
+            {/* Terms Modal */}
+            <TermsModal isOpen={showTermsModal} onClose={() => setShowTermsModal(false)} />
         </div>
     );
 }

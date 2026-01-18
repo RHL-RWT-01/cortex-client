@@ -1,8 +1,10 @@
 "use client";
 
 import { useSubscription } from '@/hooks/use-subscription';
+import { useUser } from '@/hooks/use-user';
 import { motion } from 'framer-motion';
 import {
+    ArrowLeft,
     ArrowRight,
     Brain,
     Check,
@@ -15,6 +17,7 @@ import {
     Zap
 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 const COMPARISON_FEATURES = [
@@ -45,8 +48,8 @@ const COMPARISON_FEATURES = [
 
 const FAQ_ITEMS = [
     {
-        question: 'How does the free tier work?',
-        answer: 'The free tier gives you 1 architecture task to experience Cortex, plus 1 thinking drill per day. It\'s designed to let you understand the value before committing.'
+        question: 'How does the trial work?',
+        answer: 'The free trial gives you 1 architecture task to experience Cortex, plus 1 thinking drill per day. It\'s designed to let you understand the value before committing.'
     },
     {
         question: 'Can I cancel anytime?',
@@ -63,6 +66,8 @@ const FAQ_ITEMS = [
 ];
 
 export default function PricingPage() {
+    const router = useRouter();
+    const { user } = useUser();
     const { subscription, createCheckout, loading: subscriptionLoading } = useSubscription();
     const [discountCode, setDiscountCode] = useState('');
     const [showDiscountInput, setShowDiscountInput] = useState(false);
@@ -72,6 +77,12 @@ export default function PricingPage() {
     const isPro = subscription?.plan === 'pro' && subscription?.status === 'active';
 
     const handleUpgrade = async () => {
+        // Redirect to login if user is not authenticated
+        if (!user) {
+            router.push('/login');
+            return;
+        }
+
         setCheckoutLoading(true);
         try {
             await createCheckout(discountCode || undefined);
@@ -87,84 +98,94 @@ export default function PricingPage() {
                 <div className="absolute inset-0 dot-pattern opacity-30" />
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-white/[0.02] to-transparent rounded-full blur-3xl" />
 
-                <div className="relative container-center text-center">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6 }}
+                <div className="relative container-center">
+                    {/* Back Button */}
+                    <motion.button
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.4 }}
+                        onClick={() => router.back()}
+                        className="mb-8 flex items-center gap-2 text-sm text-neutral-400 hover:text-white transition-colors group"
                     >
-                        <span className="inline-block px-4 py-1.5 mb-6 text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400 bg-white/5 border border-white/10 rounded-full">
-                            Simple Pricing
-                        </span>
+                        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+                        <span>Back</span>
+                    </motion.button>
 
-                        <h1 className="text-5xl md:text-7xl font-black text-white tracking-tighter mb-6">
-                            Invest in Your
-                            <br />
-                            <span className="text-neutral-500">Engineering Mind</span>
-                        </h1>
+                    <div className="text-center">
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6 }}
+                        >
+                            <span className="inline-block px-4 py-1.5 mb-6 text-[10px] font-black uppercase tracking-[0.2em] text-neutral-400 bg-white/5 border border-white/10 rounded-full">
+                                Simple Pricing
+                            </span>
 
-                        <p className="text-neutral-400 text-lg max-w-2xl mx-auto leading-relaxed">
-                            One plan. Full access. Build the architectural thinking skills that set senior engineers apart.
-                        </p>
-                    </motion.div>
+                            <h1 className="text-5xl md:text-7xl font-black text-white tracking-tighter mb-6">
+                                Invest in Your
+                                <br />
+                                <span className="text-neutral-500">Engineering Mind</span>
+                            </h1>
+
+                            <p className="text-neutral-400 text-lg max-w-2xl mx-auto leading-relaxed">
+                                One plan. Full access. Build the architectural thinking skills that set senior engineers apart.
+                            </p>
+                        </motion.div>
+                    </div>
                 </div>
             </section>
 
             {/* Pricing Cards */}
             <section className="container-center">
                 <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                    {/* Free Tier */}
+                    {/* Trial Tier - De-emphasized */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, delay: 0.1 }}
-                        className="glass-card rounded-3xl p-8 relative"
+                        className="rounded-3xl p-8 relative bg-neutral-900/30 border border-white/5"
                     >
                         <div className="flex items-center gap-3 mb-6">
-                            <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center">
-                                <Brain className="w-6 h-6 text-neutral-400" />
+                            <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
+                                <Zap className="w-5 h-5 text-neutral-500" />
                             </div>
                             <div>
-                                <h3 className="text-xl font-bold text-white">Free</h3>
-                                <p className="text-xs text-neutral-500">Get a taste</p>
+                                <h3 className="text-lg font-bold text-neutral-300">Trial</h3>
+                                <p className="text-xs text-neutral-600">Try before you commit</p>
                             </div>
                         </div>
 
-                        <div className="mb-8">
+                        <div className="mb-6">
                             <div className="flex items-baseline gap-1">
-                                <span className="text-4xl font-black text-white">$0</span>
-                                <span className="text-neutral-500">/forever</span>
+                                <span className="text-3xl font-bold text-neutral-400">$0</span>
                             </div>
+                            <p className="text-xs text-neutral-600 mt-1">One-time trial experience</p>
                         </div>
 
-                        <ul className="space-y-4 mb-8">
-                            <li className="flex items-center gap-3 text-sm">
-                                <Check className="w-4 h-4 text-emerald-400" />
-                                <span className="text-neutral-300">1 architecture task</span>
+                        <ul className="space-y-3 mb-6 text-sm text-neutral-500">
+                            <li className="flex items-center gap-2">
+                                <div className="w-1.5 h-1.5 rounded-full bg-neutral-600" />
+                                <span>1 architecture task</span>
                             </li>
-                            <li className="flex items-center gap-3 text-sm">
-                                <Check className="w-4 h-4 text-emerald-400" />
-                                <span className="text-neutral-300">1 drill per day</span>
+                            <li className="flex items-center gap-2">
+                                <div className="w-1.5 h-1.5 rounded-full bg-neutral-600" />
+                                <span>1 drill per day</span>
                             </li>
-                            <li className="flex items-center gap-3 text-sm">
-                                <Check className="w-4 h-4 text-emerald-400" />
-                                <span className="text-neutral-300">Basic AI feedback</span>
-                            </li>
-                            <li className="flex items-center gap-3 text-sm text-neutral-600">
-                                <X className="w-4 h-4" />
-                                <span>Limited analytics</span>
+                            <li className="flex items-center gap-2">
+                                <div className="w-1.5 h-1.5 rounded-full bg-neutral-600" />
+                                <span>Basic AI feedback</span>
                             </li>
                         </ul>
 
                         {!isPro ? (
                             <Link
                                 href="/signup"
-                                className="block w-full py-3 text-center border border-white/10 rounded-xl text-sm font-bold text-neutral-300 hover:bg-white/5 hover:border-white/20 transition-all"
+                                className="block w-full py-2.5 text-center border border-white/5 rounded-lg text-sm font-medium text-neutral-500 hover:text-neutral-300 hover:border-white/10 transition-all"
                             >
-                                Get Started Free
+                                Start Free Trial
                             </Link>
                         ) : (
-                            <div className="py-3 text-center text-sm text-neutral-500">
+                            <div className="py-2.5 text-center text-sm text-neutral-600">
                                 You have a Pro subscription
                             </div>
                         )}
@@ -288,8 +309,8 @@ export default function PricingPage() {
                             <div className="p-4 text-xs font-bold uppercase tracking-widest text-neutral-500">
                                 Feature
                             </div>
-                            <div className="p-4 text-center text-xs font-bold uppercase tracking-widest text-neutral-400">
-                                Free
+                            <div className="p-4 text-center text-xs font-bold uppercase tracking-widest text-neutral-500">
+                                Trial
                             </div>
                             <div className="p-4 text-center text-xs font-bold uppercase tracking-widest text-white">
                                 Pro
