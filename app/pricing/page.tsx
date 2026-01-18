@@ -58,7 +58,7 @@ const FAQ_ITEMS = [
     },
     {
         question: 'Do you offer refunds?',
-        answer: 'If you\'re not satisfied within the first 7 days, contact us for a full refund. No questions asked.'
+        answer: 'We understand the importance of flexibility. However, refunds are currently not available for Pro subscriptions.'
     },
 ];
 
