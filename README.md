@@ -14,7 +14,7 @@ Frontend application for the Cortex Engineering Thinking Training Platform - a p
 - **Styling**: Tailwind CSS 4
 - **UI Components**: Custom components with Lucide React icons
 - **Animations**: Framer Motion
-- **Diagramming**: Excalidraw
+- **Diagramming [canvas]**: Excalidraw
 - **HTTP Client**: Axios
 
 ## Setup Instructions
