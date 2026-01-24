@@ -18,6 +18,7 @@ export const metadata: Metadata = {
 };
 
 import { Toaster } from "sonner";
+import Script from "next/script";
 
 export default function RootLayout({
   children,
@@ -31,6 +32,12 @@ export default function RootLayout({
           {children}
         </AppLayout>
         <Toaster position="bottom-right" theme="dark" closeButton richColors />
+        <Script
+          src="https://api.usecrow.org/static/crow-widget.js"
+          data-api-url="https://api.usecrow.org"
+          data-product-id="user_38grqH8NEz0eBDwZFUd7dXdVK73"
+          data-agent-name=" Cortex Support"
+        />
       </body>
     </html>
   );
