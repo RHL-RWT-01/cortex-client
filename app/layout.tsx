@@ -32,12 +32,13 @@ export default function RootLayout({
           {children}
         </AppLayout>
         <Toaster position="bottom-right" theme="dark" closeButton richColors />
-        <Script
+        {/* <Script
           src="https://api.usecrow.org/static/crow-widget.js"
           data-api-url="https://api.usecrow.org"
           data-product-id="user_38grqH8NEz0eBDwZFUd7dXdVK73"
           data-agent-name=" Cortex Support"
-        />
+          strategy="lazyOnload"
+        /> */}
       </body>
     </html>
   );
