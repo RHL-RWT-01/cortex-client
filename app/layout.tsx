@@ -19,6 +19,7 @@ export const metadata: Metadata = {
 
 import { Toaster } from "sonner";
 import Script from "next/script";
+import { Analytics } from "@vercel/analytics/next";
 
 export default function RootLayout({
   children,
@@ -36,8 +37,9 @@ export default function RootLayout({
           src="https://api.usecrow.org/static/crow-widget.js"
           data-api-url="https://api.usecrow.org"
           data-product-id={process.env.NEXT_PUBLIC_CROW_PRODUCT_ID}
-          data-agent-name=" Cortex Support"
+          data-agent-name="Cortex Support"
         />
+        <Analytics />
       </body>
     </html>
   );
